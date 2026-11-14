@@ -16,6 +16,8 @@ const hillImage = new Image();
 hillImage.src = "assets/backround/hill.png";
 const enemyImage = new Image();
 enemyImage.src = "assets/sprites/enemy-beetle.png";
+const heartImage = new Image();
+heartImage.src = "assets/sprites/heart.png";
 
 const player = {
     x: 100,
@@ -212,9 +214,23 @@ function draw() {
         );
     }
     ctx.restore();
+    if (heartImage.complete && heartImage.naturalWidth > 0) {
+        ctx.drawImage(heartImage, 16, 12, 24, 24);
+    }
     ctx.fillStyle = "#2a1a3a";
-    ctx.font = "20px Arial";
-    ctx.fillText("Health: " + player.health + " / " + player.maxHealth, 20, 30);
+    ctx.fillRect(48, 14, 206, 20);
+    ctx.fillStyle = "#62358f";
+    ctx.fillRect(51, 17, 200, 14);
+    let healthWidth = 200 * player.health / player.maxHealth;
+    ctx.fillStyle = "#e8463c";
+    ctx.fillRect(51, 17, healthWidth, 14);
+    ctx.fillStyle = "#a8282e";
+    ctx.fillRect(51, 27, healthWidth, 4);
+    ctx.font = "bold 20px 'Pixelify Sans', Arial";
+    ctx.fillStyle = "#2a1a3a";
+    ctx.fillText(player.health + " / " + player.maxHealth, 264, 33);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(player.health + " / " + player.maxHealth, 262, 31);
 }
 function gameLoop() {
     update();
