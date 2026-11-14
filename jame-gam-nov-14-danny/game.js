@@ -26,7 +26,7 @@ const camera = {
 const enemy = {
     height: 100,
     width: 50,
-    speed: 7,
+    speed: 2,
     x: 500,
     y: 380
 };
@@ -67,6 +67,12 @@ function update() {
     player.x = Math.max(0, Math.min(3000 - player.width, player.x));
     camera.x = player.x - WIDTH / 2 + player.width / 2;
 camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
+    if (enemy.x < player.x) {
+        enemy.x += enemy.speed;
+    }
+    if (enemy.x > player.x) {
+        enemy.x -= enemy.speed;
+    }
 }
 function draw() {
     ctx.fillStyle = "#111a2c";
