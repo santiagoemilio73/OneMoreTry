@@ -1,5 +1,6 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const GRAVITY = 0.6;
@@ -133,7 +134,10 @@ camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     }
 }
 function draw() {
-    ctx.fillStyle = "#111a2c";
+    let sky = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+    sky.addColorStop(0, "#5fb8f5");
+    sky.addColorStop(1, "#c8ecff");
+    ctx.fillStyle = sky;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     ctx.save();
     ctx.translate(-camera.x, 0);
@@ -161,7 +165,7 @@ function draw() {
         );
     }
     ctx.restore();
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "#2a1a3a";
     ctx.font = "20px Arial";
     ctx.fillText("Health: " + player.health + " / " + player.maxHealth, 20, 30);
 }
