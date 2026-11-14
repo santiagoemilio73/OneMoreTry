@@ -17,7 +17,9 @@ const player = {
     speed: 5,
     velocityY: 0,
     jumpPower: -12,
-    grounded: false
+    grounded: false,
+    health: 100,
+    maxHealth: 100
 };
 const camera = {
     x: 0,
@@ -100,6 +102,9 @@ function draw() {
         );
     }
     ctx.restore();
+    ctx.fillStyle = "white";
+    ctx.font = "20px Arial";
+    ctx.fillText("Health: " + player.health + " / " + player.maxHealth, 20, 30);
 }
 function gameLoop() {
     update();
