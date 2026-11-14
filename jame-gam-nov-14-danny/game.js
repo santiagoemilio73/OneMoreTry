@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const GRAVITY = 0.6;
+const ENEMY_CHASE_RANGE = 400;
 const keys = {};
 const playerImage = new Image();
 playerImage.src = "assets/sprites/slimeSprite-20261114-130338-frame0.png";
@@ -102,11 +103,13 @@ function update() {
 camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     for (let i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
-        if (enemy.x < player.x) {
-            enemy.x += enemy.speed;
-        }
-        if (enemy.x > player.x) {
-            enemy.x -= enemy.speed;
+        if (Math.abs(enemy.x - player.x) < ENEMY_CHASE_RANGE) {
+            if (enemy.x < player.x) {
+                enemy.x += enemy.speed;
+            }
+            if (enemy.x > player.x) {
+                enemy.x -= enemy.speed;
+            }
         }
     }
     if (player.hurtTimer > 0) {
