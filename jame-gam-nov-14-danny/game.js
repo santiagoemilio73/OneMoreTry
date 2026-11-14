@@ -8,6 +8,10 @@ const ENEMY_CHASE_RANGE = 400;
 const keys = {};
 const playerImage = new Image();
 playerImage.src = "assets/sprites/player-slime.png";
+const playerWalkImage1 = new Image();
+playerWalkImage1.src = "assets/sprites/player-slime-walk-1.png";
+const playerWalkImage2 = new Image();
+playerWalkImage2.src = "assets/sprites/player-slime-walk-2.png";
 const groudnImage = new Image();
 groudnImage.src = "assets/backround/Drawing.png";
 const cloudImage = new Image();
@@ -33,7 +37,8 @@ const player = {
     health: 100,
     maxHealth: 100,
     hurtTimer: 0,
-    facingRight: true
+    facingRight: true,
+    walkTimer: 0
 };
 const camera = {
     x: 0,
@@ -119,13 +124,16 @@ const platforms = [
     { x: 2350, y: 384, width: 144, height: 48 }
 ];
 function update() {
+    let walking = false;
     if (keys["a"] || keys["arrowleft"]) {
         player.x -= player.speed;
         player.facingRight = false;
+        walking = true;
     }
     if (keys["d"] || keys["arrowright"]) {
         player.x += player.speed;
         player.facingRight = true;
+        walking = true;
     }
     if (
         (keys[" "] || keys["w"] || keys["arrowup"]) &&
@@ -155,6 +163,14 @@ function update() {
             player.velocityY = 0;
             player.grounded = true;
         }
+    }
+    if (walking && player.grounded) {
+        player.walkTimer += 1;
+        if (player.walkTimer > 16) {
+            player.walkTimer = 1;
+        }
+    } else {
+        player.walkTimer = 0;
     }
     player.x = Math.max(0, Math.min(3000 - player.width, player.x));
     camera.x = player.x - WIDTH / 2 + player.width / 2;
@@ -240,13 +256,20 @@ function draw() {
         }
     }
     if (playerImage.complete && playerImage.naturalWidth > 0) {
+        let image = playerImage;
+        if (player.walkTimer > 0 && player.walkTimer <= 8) {
+            image = playerWalkImage1;
+        }
+        if (player.walkTimer > 8) {
+            image = playerWalkImage2;
+        }
         if (player.facingRight) {
-            ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+            ctx.drawImage(image, player.x, player.y, player.width, player.height);
         } else {
             ctx.save();
             ctx.translate(player.x + player.width, player.y);
             ctx.scale(-1, 1);
-            ctx.drawImage(playerImage, 0, 0, player.width, player.height);
+            ctx.drawImage(image, 0, 0, player.width, player.height);
             ctx.restore();
         }
     }
