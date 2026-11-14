@@ -139,6 +139,20 @@ function update() {
         player.velocityY = 0;
         player.grounded = true;
     }
+    for (let i = 0; i < platforms.length; i++) {
+        let platform = platforms[i];
+        if (
+            player.velocityY >= 0 &&
+            player.x + player.width > platform.x &&
+            player.x < platform.x + platform.width &&
+            player.y + player.height >= platform.y &&
+            player.y + player.height - player.velocityY <= platform.y
+        ) {
+            player.y = platform.y - player.height;
+            player.velocityY = 0;
+            player.grounded = true;
+        }
+    }
     player.x = Math.max(0, Math.min(3000 - player.width, player.x));
     camera.x = player.x - WIDTH / 2 + player.width / 2;
 camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
