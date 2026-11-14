@@ -28,7 +28,7 @@ const enemy = {
     width: 50,
     speed: 7,
     x: 500,
-    y: 400
+    y: 380
 };
 window.addEventListener("keydown", (e) => {
     keys[e.key.toLowerCase()] = true;
@@ -82,6 +82,8 @@ function draw() {
         ground.height
     );
     }
+    ctx.fillStyle = "red";
+    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
     if (playerImage.complete && playerImage.naturalWidth > 0) {
         ctx.drawImage(
             playerImage,
