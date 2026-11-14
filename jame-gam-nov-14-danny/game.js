@@ -12,6 +12,8 @@ const playerWalkImage1 = new Image();
 playerWalkImage1.src = "assets/sprites/player-slime-walk-1.png";
 const playerWalkImage2 = new Image();
 playerWalkImage2.src = "assets/sprites/player-slime-walk-2.png";
+const swipeImage = new Image();
+swipeImage.src = "assets/sprites/swipe.png";
 const groudnImage = new Image();
 groudnImage.src = "assets/backround/Drawing.png";
 const cloudImage = new Image();
@@ -38,7 +40,10 @@ const player = {
     maxHealth: 100,
     hurtTimer: 0,
     facingRight: true,
-    walkTimer: 0
+    walkTimer: 0,
+    damage: 10,
+    attackTimer: 0,
+    attackCooldown: 0
 };
 const camera = {
     x: 0,
@@ -172,6 +177,16 @@ function update() {
     } else {
         player.walkTimer = 0;
     }
+    if (player.attackTimer > 0) {
+        player.attackTimer -= 1;
+    }
+    if (player.attackCooldown > 0) {
+        player.attackCooldown -= 1;
+    }
+    if (keys["j"] && player.attackCooldown === 0) {
+        player.attackTimer = 12;
+        player.attackCooldown = 24;
+    }
     player.x = Math.max(0, Math.min(3000 - player.width, player.x));
     camera.x = player.x - WIDTH / 2 + player.width / 2;
 camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
@@ -270,6 +285,17 @@ function draw() {
             ctx.translate(player.x + player.width, player.y);
             ctx.scale(-1, 1);
             ctx.drawImage(image, 0, 0, player.width, player.height);
+            ctx.restore();
+        }
+    }
+    if (player.attackTimer > 0 && swipeImage.complete && swipeImage.naturalWidth > 0) {
+        if (player.facingRight) {
+            ctx.drawImage(swipeImage, player.x + player.width, player.y + 12, 48, 48);
+        } else {
+            ctx.save();
+            ctx.translate(player.x, player.y + 12);
+            ctx.scale(-1, 1);
+            ctx.drawImage(swipeImage, 0, 0, 48, 48);
             ctx.restore();
         }
     }
