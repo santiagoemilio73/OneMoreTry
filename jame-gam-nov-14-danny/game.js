@@ -12,6 +12,8 @@ const groudnImage = new Image();
 groudnImage.src = "assets/backround/Drawing.png";
 const cloudImage = new Image();
 cloudImage.src = "assets/backround/cloud.png";
+const hillImage = new Image();
+hillImage.src = "assets/backround/hill.png";
 
 const player = {
     x: 100,
@@ -87,6 +89,15 @@ const clouds = [
     { x: 1450, y: 60 },
     { x: 1800, y: 110 }
 ];
+const hills = [
+    { x: -60 },
+    { x: 230 },
+    { x: 520 },
+    { x: 900 },
+    { x: 1180 },
+    { x: 1520 },
+    { x: 1840 }
+];
 function update() {
     if (keys["a"] || keys["arrowleft"]) {
         player.x -= player.speed;
@@ -153,6 +164,12 @@ function draw() {
         for (let i = 0; i < clouds.length; i++) {
             let cloud = clouds[i];
             ctx.drawImage(cloudImage, cloud.x - camera.x * 0.3, cloud.y, 96, 48);
+        }
+    }
+    if (hillImage.complete && hillImage.naturalWidth > 0) {
+        for (let i = 0; i < hills.length; i++) {
+            let hill = hills[i];
+            ctx.drawImage(hillImage, hill.x - camera.x * 0.5, ground.y - 96, 192, 96);
         }
     }
     ctx.save();
