@@ -26,13 +26,43 @@ const camera = {
     x: 0,
     y: 0
 };
-const enemy = {
-    height: 100,
-    width: 50,
-    speed: 2,
-    x: 500,
-    y: 380
-};
+const enemies = [
+    {
+        height: 100,
+        width: 50,
+        speed: 2,
+        x: 500,
+        y: 380
+    },
+    {
+        height: 100,
+        width: 50,
+        speed: 2,
+        x: 1000,
+        y: 380
+    },
+    {
+        height: 100,
+        width: 50,
+        speed: 2,
+        x: 1500,
+        y: 380
+    },
+    {
+        height: 100,
+        width: 50,
+        speed: 2,
+        x: 2000,
+        y: 380
+    },
+    {
+        height: 100,
+        width: 50,
+        speed: 2,
+        x: 2500,
+        y: 380
+    }
+];
 window.addEventListener("keydown", (e) => {
     keys[e.key.toLowerCase()] = true;
 });
@@ -70,24 +100,30 @@ function update() {
     player.x = Math.max(0, Math.min(3000 - player.width, player.x));
     camera.x = player.x - WIDTH / 2 + player.width / 2;
 camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
-    if (enemy.x < player.x) {
-        enemy.x += enemy.speed;
-    }
-    if (enemy.x > player.x) {
-        enemy.x -= enemy.speed;
+    for (let i = 0; i < enemies.length; i++) {
+        let enemy = enemies[i];
+        if (enemy.x < player.x) {
+            enemy.x += enemy.speed;
+        }
+        if (enemy.x > player.x) {
+            enemy.x -= enemy.speed;
+        }
     }
     if (player.hurtTimer > 0) {
         player.hurtTimer -= 1;
     }
-    if (
-        player.x < enemy.x + enemy.width &&
-        player.x + player.width > enemy.x &&
-        player.y < enemy.y + enemy.height &&
-        player.y + player.height > enemy.y &&
-        player.hurtTimer === 0
-    ) {
-        player.health -= 10;
-        player.hurtTimer = 60;
+    for (let i = 0; i < enemies.length; i++) {
+        let enemy = enemies[i];
+        if (
+            player.x < enemy.x + enemy.width &&
+            player.x + player.width > enemy.x &&
+            player.y < enemy.y + enemy.height &&
+            player.y + player.height > enemy.y &&
+            player.hurtTimer === 0
+        ) {
+            player.health -= 10;
+            player.hurtTimer = 60;
+        }
     }
     if (player.health < 0) {
         player.health = 0;
@@ -108,7 +144,10 @@ function draw() {
     );
     }
     ctx.fillStyle = "red";
-    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    for (let i = 0; i < enemies.length; i++) {
+        let enemy = enemies[i];
+        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    }
     if (playerImage.complete && playerImage.naturalWidth > 0) {
         ctx.drawImage(
             playerImage,
