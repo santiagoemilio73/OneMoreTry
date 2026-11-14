@@ -32,7 +32,8 @@ const player = {
     grounded: false,
     health: 100,
     maxHealth: 100,
-    hurtTimer: 0
+    hurtTimer: 0,
+    facingRight: true
 };
 const camera = {
     x: 0,
@@ -120,9 +121,11 @@ const platforms = [
 function update() {
     if (keys["a"] || keys["arrowleft"]) {
         player.x -= player.speed;
+        player.facingRight = false;
     }
     if (keys["d"] || keys["arrowright"]) {
         player.x += player.speed;
+        player.facingRight = true;
     }
     if (
         (keys[" "] || keys["w"] || keys["arrowup"]) &&
@@ -237,13 +240,15 @@ function draw() {
         }
     }
     if (playerImage.complete && playerImage.naturalWidth > 0) {
-        ctx.drawImage(
-            playerImage,
-            player.x,
-            player.y,
-            player.width,
-            player.height
-        );
+        if (player.facingRight) {
+            ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+        } else {
+            ctx.save();
+            ctx.translate(player.x + player.width, player.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(playerImage, 0, 0, player.width, player.height);
+            ctx.restore();
+        }
     }
     ctx.restore();
     if (heartImage.complete && heartImage.naturalWidth > 0) {
