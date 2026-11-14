@@ -10,6 +10,8 @@ const playerImage = new Image();
 playerImage.src = "assets/sprites/slimeSprite-20261114-130338-frame0.png";
 const groudnImage = new Image();
 groudnImage.src = "assets/backround/Drawing.png";
+const cloudImage = new Image();
+cloudImage.src = "assets/backround/cloud.png";
 
 const player = {
     x: 100,
@@ -77,6 +79,14 @@ const ground = {
     width: 3000,
     height: 60
 };
+const clouds = [
+    { x: 80, y: 50 },
+    { x: 420, y: 120 },
+    { x: 760, y: 70 },
+    { x: 1100, y: 140 },
+    { x: 1450, y: 60 },
+    { x: 1800, y: 110 }
+];
 function update() {
     if (keys["a"] || keys["arrowleft"]) {
         player.x -= player.speed;
@@ -139,6 +149,12 @@ function draw() {
     sky.addColorStop(1, "#c8ecff");
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    if (cloudImage.complete && cloudImage.naturalWidth > 0) {
+        for (let i = 0; i < clouds.length; i++) {
+            let cloud = clouds[i];
+            ctx.drawImage(cloudImage, cloud.x - camera.x * 0.3, cloud.y, 96, 48);
+        }
+    }
     ctx.save();
     ctx.translate(-camera.x, 0);
     if(groudnImage.complete && groudnImage.naturalWidth > 0) {
