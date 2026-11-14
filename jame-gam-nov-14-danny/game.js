@@ -9,7 +9,7 @@ const keys = {};
 const playerImage = new Image();
 playerImage.src = "assets/sprites/slimeSprite-20261114-130338-frame0.png";
 const groudnImage = new Image();
-groudnImage.src = "assets/backround/tile.png";
+groudnImage.src = "assets/backround/Drawing.png";
 
 const player = {
     x: 100,
@@ -142,13 +142,9 @@ function draw() {
     ctx.save();
     ctx.translate(-camera.x, 0);
     if(groudnImage.complete && groudnImage.naturalWidth > 0) {
-    ctx.drawImage(
-        groudnImage,
-        ground.x,
-        ground.y,
-        3000,
-        ground.height
-    );
+    for (let x = ground.x; x < ground.x + ground.width; x += 96) {
+        ctx.drawImage(groudnImage, x, ground.y, 96, 96);
+    }
     }
     ctx.fillStyle = "red";
     for (let i = 0; i < enemies.length; i++) {
