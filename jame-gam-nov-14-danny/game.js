@@ -19,7 +19,8 @@ const player = {
     jumpPower: -12,
     grounded: false,
     health: 100,
-    maxHealth: 100
+    maxHealth: 100,
+    hurtTimer: 0
 };
 const camera = {
     x: 0,
@@ -74,6 +75,22 @@ camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     }
     if (enemy.x > player.x) {
         enemy.x -= enemy.speed;
+    }
+    if (player.hurtTimer > 0) {
+        player.hurtTimer -= 1;
+    }
+    if (
+        player.x < enemy.x + enemy.width &&
+        player.x + player.width > enemy.x &&
+        player.y < enemy.y + enemy.height &&
+        player.y + player.height > enemy.y &&
+        player.hurtTimer === 0
+    ) {
+        player.health -= 10;
+        player.hurtTimer = 60;
+    }
+    if (player.health < 0) {
+        player.health = 0;
     }
 }
 function draw() {
