@@ -55,6 +55,9 @@ const enemies = [
         width: 48,
         speed: 2,
         facingRight: false,
+        health: 30,
+        maxHealth: 30,
+        alive: true,
         x: 500,
         y: 432
     },
@@ -63,6 +66,9 @@ const enemies = [
         width: 48,
         speed: 2,
         facingRight: false,
+        health: 30,
+        maxHealth: 30,
+        alive: true,
         x: 1000,
         y: 432
     },
@@ -71,6 +77,9 @@ const enemies = [
         width: 48,
         speed: 2,
         facingRight: false,
+        health: 30,
+        maxHealth: 30,
+        alive: true,
         x: 1500,
         y: 432
     },
@@ -79,6 +88,9 @@ const enemies = [
         width: 48,
         speed: 2,
         facingRight: false,
+        health: 30,
+        maxHealth: 30,
+        alive: true,
         x: 2000,
         y: 432
     },
@@ -87,6 +99,9 @@ const enemies = [
         width: 48,
         speed: 2,
         facingRight: false,
+        health: 30,
+        maxHealth: 30,
+        alive: true,
         x: 2500,
         y: 432
     }
@@ -186,13 +201,34 @@ function update() {
     if (keys["j"] && player.attackCooldown === 0) {
         player.attackTimer = 12;
         player.attackCooldown = 24;
+        let attackX = player.x;
+        if (!player.facingRight) {
+            attackX = player.x - 48;
+        }
+        let attackWidth = player.width + 48;
+        for (let i = 0; i < enemies.length; i++) {
+            let enemy = enemies[i];
+            if (
+                enemy.alive &&
+                attackX < enemy.x + enemy.width &&
+                attackX + attackWidth > enemy.x &&
+                player.y < enemy.y + enemy.height &&
+                player.y + player.height > enemy.y
+            ) {
+                enemy.health -= player.damage;
+                if (enemy.health <= 0) {
+                    enemy.health = 0;
+                    enemy.alive = false;
+                }
+            }
+        }
     }
     player.x = Math.max(0, Math.min(3000 - player.width, player.x));
     camera.x = player.x - WIDTH / 2 + player.width / 2;
 camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     for (let i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
-        if (Math.abs(enemy.x - player.x) < ENEMY_CHASE_RANGE) {
+        if (enemy.alive && Math.abs(enemy.x - player.x) < ENEMY_CHASE_RANGE) {
             if (enemy.x < player.x - enemy.speed) {
                 enemy.x += enemy.speed;
                 enemy.facingRight = true;
@@ -209,6 +245,7 @@ camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     for (let i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
         if (
+            enemy.alive &&
             player.x < enemy.x + enemy.width &&
             player.x + player.width > enemy.x &&
             player.y < enemy.y + enemy.height &&
@@ -259,6 +296,9 @@ function draw() {
     if (enemyImage.complete && enemyImage.naturalWidth > 0) {
         for (let i = 0; i < enemies.length; i++) {
             let enemy = enemies[i];
+            if (!enemy.alive) {
+                continue;
+            }
             if (enemy.facingRight) {
                 ctx.save();
                 ctx.translate(enemy.x + enemy.width, enemy.y);
