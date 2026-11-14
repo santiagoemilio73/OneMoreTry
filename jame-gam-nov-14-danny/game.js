@@ -18,6 +18,8 @@ const enemyImage = new Image();
 enemyImage.src = "assets/sprites/enemy-beetle.png";
 const heartImage = new Image();
 heartImage.src = "assets/sprites/heart.png";
+const blockImage = new Image();
+blockImage.src = "assets/backround/block-stone.png";
 
 const player = {
     x: 100,
@@ -107,6 +109,14 @@ const hills = [
     { x: 1520 },
     { x: 1840 }
 ];
+const platforms = [
+    { x: 600, y: 384, width: 144, height: 48 },
+    { x: 840, y: 288, width: 96, height: 48 },
+    { x: 1250, y: 384, width: 192, height: 48 },
+    { x: 1750, y: 384, width: 96, height: 48 },
+    { x: 1900, y: 288, width: 144, height: 48 },
+    { x: 2350, y: 384, width: 144, height: 48 }
+];
 function update() {
     if (keys["a"] || keys["arrowleft"]) {
         player.x -= player.speed;
@@ -189,6 +199,14 @@ function draw() {
     for (let x = ground.x; x < ground.x + ground.width; x += 96) {
         ctx.drawImage(groudnImage, x, ground.y, 96, 96);
     }
+    }
+    if (blockImage.complete && blockImage.naturalWidth > 0) {
+        for (let i = 0; i < platforms.length; i++) {
+            let platform = platforms[i];
+            for (let x = platform.x; x < platform.x + platform.width; x += 48) {
+                ctx.drawImage(blockImage, x, platform.y, 48, 48);
+            }
+        }
     }
     if (enemyImage.complete && enemyImage.naturalWidth > 0) {
         for (let i = 0; i < enemies.length; i++) {
