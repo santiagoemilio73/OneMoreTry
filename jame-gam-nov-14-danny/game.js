@@ -39,6 +39,7 @@ const enemies = [
         height: 48,
         width: 48,
         speed: 2,
+        facingRight: false,
         x: 500,
         y: 432
     },
@@ -46,6 +47,7 @@ const enemies = [
         height: 48,
         width: 48,
         speed: 2,
+        facingRight: false,
         x: 1000,
         y: 432
     },
@@ -53,6 +55,7 @@ const enemies = [
         height: 48,
         width: 48,
         speed: 2,
+        facingRight: false,
         x: 1500,
         y: 432
     },
@@ -60,6 +63,7 @@ const enemies = [
         height: 48,
         width: 48,
         speed: 2,
+        facingRight: false,
         x: 2000,
         y: 432
     },
@@ -67,6 +71,7 @@ const enemies = [
         height: 48,
         width: 48,
         speed: 2,
+        facingRight: false,
         x: 2500,
         y: 432
     }
@@ -128,11 +133,13 @@ camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     for (let i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
         if (Math.abs(enemy.x - player.x) < ENEMY_CHASE_RANGE) {
-            if (enemy.x < player.x) {
+            if (enemy.x < player.x - enemy.speed) {
                 enemy.x += enemy.speed;
+                enemy.facingRight = true;
             }
-            if (enemy.x > player.x) {
+            if (enemy.x > player.x + enemy.speed) {
                 enemy.x -= enemy.speed;
+                enemy.facingRight = false;
             }
         }
     }
@@ -184,7 +191,15 @@ function draw() {
     if (enemyImage.complete && enemyImage.naturalWidth > 0) {
         for (let i = 0; i < enemies.length; i++) {
             let enemy = enemies[i];
-            ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
+            if (enemy.facingRight) {
+                ctx.save();
+                ctx.translate(enemy.x + enemy.width, enemy.y);
+                ctx.scale(-1, 1);
+                ctx.drawImage(enemyImage, 0, 0, enemy.width, enemy.height);
+                ctx.restore();
+            } else {
+                ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
+            }
         }
     }
     if (playerImage.complete && playerImage.naturalWidth > 0) {
