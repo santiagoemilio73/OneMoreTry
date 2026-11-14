@@ -14,6 +14,8 @@ const cloudImage = new Image();
 cloudImage.src = "assets/backround/cloud.png";
 const hillImage = new Image();
 hillImage.src = "assets/backround/hill.png";
+const enemyImage = new Image();
+enemyImage.src = "assets/sprites/enemy-beetle.png";
 
 const player = {
     x: 100,
@@ -34,39 +36,39 @@ const camera = {
 };
 const enemies = [
     {
-        height: 100,
-        width: 50,
+        height: 48,
+        width: 48,
         speed: 2,
         x: 500,
-        y: 380
+        y: 432
     },
     {
-        height: 100,
-        width: 50,
+        height: 48,
+        width: 48,
         speed: 2,
         x: 1000,
-        y: 380
+        y: 432
     },
     {
-        height: 100,
-        width: 50,
+        height: 48,
+        width: 48,
         speed: 2,
         x: 1500,
-        y: 380
+        y: 432
     },
     {
-        height: 100,
-        width: 50,
+        height: 48,
+        width: 48,
         speed: 2,
         x: 2000,
-        y: 380
+        y: 432
     },
     {
-        height: 100,
-        width: 50,
+        height: 48,
+        width: 48,
         speed: 2,
         x: 2500,
-        y: 380
+        y: 432
     }
 ];
 window.addEventListener("keydown", (e) => {
@@ -179,10 +181,11 @@ function draw() {
         ctx.drawImage(groudnImage, x, ground.y, 96, 96);
     }
     }
-    ctx.fillStyle = "red";
-    for (let i = 0; i < enemies.length; i++) {
-        let enemy = enemies[i];
-        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    if (enemyImage.complete && enemyImage.naturalWidth > 0) {
+        for (let i = 0; i < enemies.length; i++) {
+            let enemy = enemies[i];
+            ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
+        }
     }
     if (playerImage.complete && playerImage.naturalWidth > 0) {
         ctx.drawImage(
