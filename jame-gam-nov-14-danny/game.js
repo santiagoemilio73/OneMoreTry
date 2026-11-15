@@ -6,6 +6,9 @@ const HEIGHT = canvas.height;
 const GRAVITY = 0.6;
 const ENEMY_CHASE_RANGE = 400;
 let gameState = "playing";
+let maxTime = 3600;
+let timeLeft = 3600;
+let deathReason = "";
 const keys = {};
 const playerImage = new Image();
 playerImage.src = "assets/sprites/player-slime.png";
@@ -27,6 +30,8 @@ const heartImage = new Image();
 heartImage.src = "assets/sprites/heart.png";
 const blockImage = new Image();
 blockImage.src = "assets/backround/block-stone.png";
+const hourglassImage = new Image();
+hourglassImage.src = "assets/sprites/hourglass.png";
 
 const player = {
     x: 100,
@@ -61,6 +66,7 @@ const enemies = [
         alive: true,
         hurtTimer: 0,
         x: 500,
+        startX: 500,
         y: 432
     },
     {
@@ -73,6 +79,7 @@ const enemies = [
         alive: true,
         hurtTimer: 0,
         x: 1000,
+        startX: 1000,
         y: 432
     },
     {
@@ -85,6 +92,7 @@ const enemies = [
         alive: true,
         hurtTimer: 0,
         x: 1500,
+        startX: 1500,
         y: 432
     },
     {
@@ -97,6 +105,7 @@ const enemies = [
         alive: true,
         hurtTimer: 0,
         x: 2000,
+        startX: 2000,
         y: 432
     },
     {
@@ -109,6 +118,7 @@ const enemies = [
         alive: true,
         hurtTimer: 0,
         x: 2500,
+        startX: 2500,
         y: 432
     }
 ];
@@ -149,7 +159,32 @@ const platforms = [
     { x: 1900, y: 288, width: 144, height: 48 },
     { x: 2350, y: 384, width: 144, height: 48 }
 ];
+function resetRun() {
+    player.x = 100;
+    player.y = 300;
+    player.velocityY = 0;
+    player.health = player.maxHealth;
+    player.hurtTimer = 0;
+    player.facingRight = true;
+    player.walkTimer = 0;
+    player.attackTimer = 0;
+    player.attackCooldown = 0;
+    for (let i = 0; i < enemies.length; i++) {
+        let enemy = enemies[i];
+        enemy.x = enemy.startX;
+        enemy.health = enemy.maxHealth;
+        enemy.alive = true;
+        enemy.hurtTimer = 0;
+        enemy.facingRight = false;
+    }
+    camera.x = 0;
+    timeLeft = maxTime;
+    gameState = "playing";
+}
 function update() {
+    if (gameState === "dead" && keys["enter"]) {
+        resetRun();
+    }
     if (gameState !== "playing") {
         return;
     }
@@ -277,8 +312,15 @@ camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     if (player.health < 0) {
         player.health = 0;
     }
+    timeLeft -= 1;
+    if (timeLeft <= 0) {
+        timeLeft = 0;
+        gameState = "dead";
+        deathReason = "Out of time";
+    }
     if (player.health === 0) {
         gameState = "dead";
+        deathReason = "Out of health";
     }
 }
 function draw() {
@@ -385,15 +427,28 @@ function draw() {
     ctx.fillText(player.health + " / " + player.maxHealth, 264, 33);
     ctx.fillStyle = "#ffffff";
     ctx.fillText(player.health + " / " + player.maxHealth, 262, 31);
+    if (hourglassImage.complete && hourglassImage.naturalWidth > 0) {
+        ctx.drawImage(hourglassImage, WIDTH - 104, 12, 24, 24);
+    }
+    let secondsLeft = Math.ceil(timeLeft / 60);
+    ctx.fillStyle = "#2a1a3a";
+    ctx.fillText(secondsLeft, WIDTH - 70, 33);
+    ctx.fillStyle = "#ffffff";
+    if (secondsLeft <= 10) {
+        ctx.fillStyle = "#e8463c";
+    }
+    ctx.fillText(secondsLeft, WIDTH - 72, 31);
     if (gameState === "dead") {
         ctx.fillStyle = "rgba(42, 26, 58, 0.75)";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
         ctx.textAlign = "center";
         ctx.font = "bold 64px 'Pixelify Sans', Arial";
         ctx.fillStyle = "#a8282e";
-        ctx.fillText("Out of health", WIDTH / 2 + 4, 230);
+        ctx.fillText(deathReason, WIDTH / 2 + 4, 230);
         ctx.fillStyle = "#ffffff";
-        ctx.fillText("Out of health", WIDTH / 2, 226);
+        ctx.fillText(deathReason, WIDTH / 2, 226);
+        ctx.font = "24px 'Pixelify Sans', Arial";
+        ctx.fillText("Press Enter for one more try", WIDTH / 2, 290);
         ctx.textAlign = "left";
     }
 }
