@@ -5,6 +5,7 @@ const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const GRAVITY = 0.6;
 const ENEMY_CHASE_RANGE = 400;
+let gameState = "playing";
 const keys = {};
 const playerImage = new Image();
 playerImage.src = "assets/sprites/player-slime.png";
@@ -149,6 +150,9 @@ const platforms = [
     { x: 2350, y: 384, width: 144, height: 48 }
 ];
 function update() {
+    if (gameState !== "playing") {
+        return;
+    }
     let walking = false;
     if (keys["a"] || keys["arrowleft"]) {
         player.x -= player.speed;
@@ -273,6 +277,9 @@ camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     if (player.health < 0) {
         player.health = 0;
     }
+    if (player.health === 0) {
+        gameState = "dead";
+    }
 }
 function draw() {
     let sky = ctx.createLinearGradient(0, 0, 0, HEIGHT);
@@ -378,6 +385,17 @@ function draw() {
     ctx.fillText(player.health + " / " + player.maxHealth, 264, 33);
     ctx.fillStyle = "#ffffff";
     ctx.fillText(player.health + " / " + player.maxHealth, 262, 31);
+    if (gameState === "dead") {
+        ctx.fillStyle = "rgba(42, 26, 58, 0.75)";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.textAlign = "center";
+        ctx.font = "bold 64px 'Pixelify Sans', Arial";
+        ctx.fillStyle = "#a8282e";
+        ctx.fillText("Out of health", WIDTH / 2 + 4, 230);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("Out of health", WIDTH / 2, 226);
+        ctx.textAlign = "left";
+    }
 }
 function gameLoop() {
     update();
