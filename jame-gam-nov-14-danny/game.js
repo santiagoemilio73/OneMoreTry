@@ -327,7 +327,11 @@ function draw() {
             }
         }
     }
-    if (playerImage.complete && playerImage.naturalWidth > 0) {
+    let showPlayer = true;
+    if (player.hurtTimer > 0 && player.hurtTimer % 8 < 4) {
+        showPlayer = false;
+    }
+    if (showPlayer && playerImage.complete && playerImage.naturalWidth > 0) {
         let image = playerImage;
         if (player.walkTimer > 0 && player.walkTimer <= 8) {
             image = playerWalkImage1;
