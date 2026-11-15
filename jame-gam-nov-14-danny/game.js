@@ -5,7 +5,7 @@ const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const GRAVITY = 0.6;
 const ENEMY_CHASE_RANGE = 400;
-let gameState = "playing";
+let gameState = "menu";
 let maxTime = 3600;
 let timeLeft = 3600;
 let deathReason = "";
@@ -41,7 +41,7 @@ hourglassImage.src = "assets/sprites/hourglass.png";
 
 const player = {
     x: 100,
-    y: 300,
+    y: 408,
     width: 48,
     height: 72,
     speed: 5,
@@ -131,16 +131,23 @@ const enemies = [
 window.addEventListener("keydown", (e) => {
     let key = e.key.toLowerCase();
     keys[key] = true;
-    if (gameState === "dead") {
+    if (e.repeat) {
+        return;
+    }
+    if (gameState === "menu") {
+        if (key === "enter") {
+            startNewGame();
+        }
+    } else if (gameState === "dead") {
         if (key === "arrowup" || key === "w") {
             selectedOption -= 1;
             if (selectedOption < 0) {
-                selectedOption = 2;
+                selectedOption = 3;
             }
         }
         if (key === "arrowdown" || key === "s") {
             selectedOption += 1;
-            if (selectedOption > 2) {
+            if (selectedOption > 3) {
                 selectedOption = 0;
             }
         }
@@ -185,7 +192,7 @@ const platforms = [
 ];
 function resetRun() {
     player.x = 100;
-    player.y = 300;
+    player.y = 408;
     player.velocityY = 0;
     player.grounded = false;
     player.health = player.maxHealth;
@@ -211,7 +218,19 @@ function applyUpgrades() {
     player.damage = 10 + damageLevel * 10;
     maxTime = 3600 + timeLevel * 3600;
 }
+function startNewGame() {
+    healthLevel = 0;
+    damageLevel = 0;
+    timeLevel = 0;
+    deaths = 0;
+    applyUpgrades();
+    resetRun();
+}
 function chooseUpgrade() {
+    if (selectedOption === 3) {
+        gameState = "menu";
+        return;
+    }
     if (healthLevel === MAX_UPGRADE_LEVEL && damageLevel === MAX_UPGRADE_LEVEL && timeLevel === MAX_UPGRADE_LEVEL) {
         resetRun();
         return;
@@ -544,10 +563,45 @@ function draw() {
         drawUpgradeRow(0, heartImage, "Health", "+100 max health", healthLevel, 196);
         drawUpgradeRow(1, swipeImage, "Damage", "+10 damage per hit", damageLevel, 272);
         drawUpgradeRow(2, hourglassImage, "Time", "+60 seconds", timeLevel, 348);
+        if (selectedOption === 3) {
+            ctx.fillStyle = "#ffd84a";
+            ctx.fillRect(326, 420, 308, 52);
+        }
+        ctx.fillStyle = "#2a1a3a";
+        ctx.fillRect(330, 424, 300, 44);
+        ctx.fillStyle = "#62358f";
+        ctx.fillRect(334, 428, 292, 36);
         ctx.textAlign = "center";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 20px 'Pixelify Sans', Arial";
+        ctx.fillText("Main Menu (ends this game)", WIDTH / 2, 453);
         ctx.fillStyle = "#cfa6f5";
         ctx.font = "18px 'Pixelify Sans', Arial";
-        ctx.fillText("W / S or arrow keys to choose, Enter to pick", WIDTH / 2, 456);
+        ctx.fillText("W / S or arrow keys to choose, Enter to pick", WIDTH / 2, 504);
+        ctx.textAlign = "left";
+    }
+    if (gameState === "menu") {
+        ctx.fillStyle = "rgba(42, 26, 58, 0.55)";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.textAlign = "center";
+        ctx.font = "bold 80px 'Pixelify Sans', Arial";
+        ctx.fillStyle = "#2f7a3a";
+        ctx.fillText("One More Try", WIDTH / 2 + 5, 185);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("One More Try", WIDTH / 2, 180);
+        ctx.font = "24px 'Pixelify Sans', Arial";
+        ctx.fillStyle = "#e4f4ff";
+        ctx.fillText("Every failure makes you stronger.", WIDTH / 2, 228);
+        ctx.fillStyle = "#2a1a3a";
+        ctx.fillRect(WIDTH / 2 - 170, 290, 340, 68);
+        ctx.fillStyle = "#ffd84a";
+        ctx.fillRect(WIDTH / 2 - 166, 294, 332, 60);
+        ctx.fillStyle = "#2a1a3a";
+        ctx.font = "bold 28px 'Pixelify Sans', Arial";
+        ctx.fillText("Press Enter to start", WIDTH / 2, 334);
+        ctx.fillStyle = "#e4f4ff";
+        ctx.font = "18px 'Pixelify Sans', Arial";
+        ctx.fillText("A / D to move, Space to jump, J to attack", WIDTH / 2, 420);
         ctx.textAlign = "left";
     }
 }
