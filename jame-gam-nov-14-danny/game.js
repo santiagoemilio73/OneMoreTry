@@ -58,6 +58,7 @@ const enemies = [
         health: 30,
         maxHealth: 30,
         alive: true,
+        hurtTimer: 0,
         x: 500,
         y: 432
     },
@@ -69,6 +70,7 @@ const enemies = [
         health: 30,
         maxHealth: 30,
         alive: true,
+        hurtTimer: 0,
         x: 1000,
         y: 432
     },
@@ -80,6 +82,7 @@ const enemies = [
         health: 30,
         maxHealth: 30,
         alive: true,
+        hurtTimer: 0,
         x: 1500,
         y: 432
     },
@@ -91,6 +94,7 @@ const enemies = [
         health: 30,
         maxHealth: 30,
         alive: true,
+        hurtTimer: 0,
         x: 2000,
         y: 432
     },
@@ -102,6 +106,7 @@ const enemies = [
         health: 30,
         maxHealth: 30,
         alive: true,
+        hurtTimer: 0,
         x: 2500,
         y: 432
     }
@@ -216,6 +221,12 @@ function update() {
                 player.y + player.height > enemy.y
             ) {
                 enemy.health -= player.damage;
+                enemy.hurtTimer = 12;
+                if (player.facingRight) {
+                    enemy.x += 24;
+                } else {
+                    enemy.x -= 24;
+                }
                 if (enemy.health <= 0) {
                     enemy.health = 0;
                     enemy.alive = false;
@@ -228,7 +239,10 @@ function update() {
 camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     for (let i = 0; i < enemies.length; i++) {
         let enemy = enemies[i];
-        if (enemy.alive && Math.abs(enemy.x - player.x) < ENEMY_CHASE_RANGE) {
+        if (enemy.hurtTimer > 0) {
+            enemy.hurtTimer -= 1;
+        }
+        if (enemy.alive && enemy.hurtTimer === 0 && Math.abs(enemy.x - player.x) < ENEMY_CHASE_RANGE) {
             if (enemy.x < player.x - enemy.speed) {
                 enemy.x += enemy.speed;
                 enemy.facingRight = true;
@@ -297,6 +311,9 @@ function draw() {
         for (let i = 0; i < enemies.length; i++) {
             let enemy = enemies[i];
             if (!enemy.alive) {
+                continue;
+            }
+            if (enemy.hurtTimer > 0 && enemy.hurtTimer % 4 < 2) {
                 continue;
             }
             if (enemy.facingRight) {
