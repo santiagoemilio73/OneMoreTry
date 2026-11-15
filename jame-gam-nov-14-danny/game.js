@@ -9,6 +9,12 @@ let gameState = "playing";
 let maxTime = 3600;
 let timeLeft = 3600;
 let deathReason = "";
+const MAX_UPGRADE_LEVEL = 19;
+let healthLevel = 0;
+let damageLevel = 0;
+let timeLevel = 0;
+let selectedOption = 0;
+let deaths = 0;
 const keys = {};
 const playerImage = new Image();
 playerImage.src = "assets/sprites/player-slime.png";
@@ -123,7 +129,25 @@ const enemies = [
     }
 ];
 window.addEventListener("keydown", (e) => {
-    keys[e.key.toLowerCase()] = true;
+    let key = e.key.toLowerCase();
+    keys[key] = true;
+    if (gameState === "dead") {
+        if (key === "arrowup" || key === "w") {
+            selectedOption -= 1;
+            if (selectedOption < 0) {
+                selectedOption = 2;
+            }
+        }
+        if (key === "arrowdown" || key === "s") {
+            selectedOption += 1;
+            if (selectedOption > 2) {
+                selectedOption = 0;
+            }
+        }
+        if (key === "enter") {
+            chooseUpgrade();
+        }
+    }
 });
 window.addEventListener("keyup", (e) => {
     keys[e.key.toLowerCase()] = false;
@@ -163,6 +187,7 @@ function resetRun() {
     player.x = 100;
     player.y = 300;
     player.velocityY = 0;
+    player.grounded = false;
     player.health = player.maxHealth;
     player.hurtTimer = 0;
     player.facingRight = true;
@@ -181,10 +206,44 @@ function resetRun() {
     timeLeft = maxTime;
     gameState = "playing";
 }
-function update() {
-    if (gameState === "dead" && keys["enter"]) {
+function applyUpgrades() {
+    player.maxHealth = 100 + healthLevel * 100;
+    player.damage = 10 + damageLevel * 10;
+    maxTime = 3600 + timeLevel * 3600;
+}
+function chooseUpgrade() {
+    if (healthLevel === MAX_UPGRADE_LEVEL && damageLevel === MAX_UPGRADE_LEVEL && timeLevel === MAX_UPGRADE_LEVEL) {
+        resetRun();
+        return;
+    }
+    let picked = false;
+    if (selectedOption === 0 && healthLevel < MAX_UPGRADE_LEVEL) {
+        healthLevel += 1;
+        picked = true;
+    }
+    if (selectedOption === 1 && damageLevel < MAX_UPGRADE_LEVEL) {
+        damageLevel += 1;
+        picked = true;
+    }
+    if (selectedOption === 2 && timeLevel < MAX_UPGRADE_LEVEL) {
+        timeLevel += 1;
+        picked = true;
+    }
+    if (picked) {
+        applyUpgrades();
         resetRun();
     }
+}
+function die(reason) {
+    if (gameState === "dead") {
+        return;
+    }
+    gameState = "dead";
+    deathReason = reason;
+    deaths += 1;
+    selectedOption = 0;
+}
+function update() {
     if (gameState !== "playing") {
         return;
     }
@@ -315,13 +374,45 @@ camera.x = Math.max(0, Math.min(3000 - WIDTH, camera.x));
     timeLeft -= 1;
     if (timeLeft <= 0) {
         timeLeft = 0;
-        gameState = "dead";
-        deathReason = "Out of time";
+        die("Out of time");
     }
     if (player.health === 0) {
-        gameState = "dead";
-        deathReason = "Out of health";
+        die("Out of health");
     }
+}
+function drawUpgradeRow(index, image, name, effect, level, y) {
+    let x = 200;
+    let width = 560;
+    let height = 60;
+    if (selectedOption === index) {
+        ctx.fillStyle = "#ffd84a";
+        ctx.fillRect(x - 4, y - 4, width + 8, height + 8);
+    }
+    ctx.fillStyle = "#2a1a3a";
+    ctx.fillRect(x, y, width, height);
+    ctx.fillStyle = "#62358f";
+    if (level >= MAX_UPGRADE_LEVEL) {
+        ctx.fillStyle = "#3d2752";
+    }
+    ctx.fillRect(x + 4, y + 4, width - 8, height - 8);
+    if (image.complete && image.naturalWidth > 0) {
+        ctx.drawImage(image, x + 18, y + 14, 32, 32);
+    }
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 24px 'Pixelify Sans', Arial";
+    ctx.fillText(name, x + 66, y + 39);
+    ctx.fillStyle = "#cfa6f5";
+    ctx.font = "18px 'Pixelify Sans', Arial";
+    if (level >= MAX_UPGRADE_LEVEL) {
+        ctx.fillText("Maxed out", x + 190, y + 37);
+    } else {
+        ctx.fillText(effect, x + 190, y + 37);
+    }
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#ffd84a";
+    ctx.font = "bold 20px 'Pixelify Sans', Arial";
+    ctx.fillText("Lv " + level + " / " + MAX_UPGRADE_LEVEL, x + width - 20, y + 38);
+    ctx.textAlign = "left";
 }
 function draw() {
     let sky = ctx.createLinearGradient(0, 0, 0, HEIGHT);
@@ -439,16 +530,24 @@ function draw() {
     }
     ctx.fillText(secondsLeft, WIDTH - 72, 31);
     if (gameState === "dead") {
-        ctx.fillStyle = "rgba(42, 26, 58, 0.75)";
+        ctx.fillStyle = "rgba(42, 26, 58, 0.8)";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
         ctx.textAlign = "center";
-        ctx.font = "bold 64px 'Pixelify Sans', Arial";
+        ctx.font = "bold 56px 'Pixelify Sans', Arial";
         ctx.fillStyle = "#a8282e";
-        ctx.fillText(deathReason, WIDTH / 2 + 4, 230);
+        ctx.fillText(deathReason, WIDTH / 2 + 4, 114);
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(deathReason, WIDTH / 2, 226);
-        ctx.font = "24px 'Pixelify Sans', Arial";
-        ctx.fillText("Press Enter for one more try", WIDTH / 2, 290);
+        ctx.fillText(deathReason, WIDTH / 2, 110);
+        ctx.font = "22px 'Pixelify Sans', Arial";
+        ctx.fillText("Pick an upgrade for one more try", WIDTH / 2, 156);
+        ctx.textAlign = "left";
+        drawUpgradeRow(0, heartImage, "Health", "+100 max health", healthLevel, 196);
+        drawUpgradeRow(1, swipeImage, "Damage", "+10 damage per hit", damageLevel, 272);
+        drawUpgradeRow(2, hourglassImage, "Time", "+60 seconds", timeLevel, 348);
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#cfa6f5";
+        ctx.font = "18px 'Pixelify Sans', Arial";
+        ctx.fillText("W / S or arrow keys to choose, Enter to pick", WIDTH / 2, 456);
         ctx.textAlign = "left";
     }
 }
